@@ -44,7 +44,7 @@ def get_data(session_data, type: str = "me"):
             "email": (
                 res_json["data"]["email"] if res_json["data"] is not None else None
             ),
-            "vip": (
+            "viplevel": (
                 res_json["data"]["vipLevel"] if res_json["data"] is not None else None
             ),
             "roll": (
@@ -57,7 +57,7 @@ def get_data(session_data, type: str = "me"):
         else {
             "msg": print(f"Error Occured:\nCode: {res.status_code}\nMessage: {res}"),
             "email": None,
-            "vip": None,
+            "viplevel": None,
             "roll": 0,
         }
     )
@@ -68,19 +68,23 @@ results = []
 
 for i, session in enumerate(sessions):
     my_details = get_data(session)
-    email, vip, roll = my_details["email"], my_details["vip"], get_data(session)["roll"]
+    email, viplevel, roll = (
+        my_details["email"],
+        my_details["viplevel"],
+        get_data(session)["roll"],
+    )
+    results.append((roll, email, viplevel))
 
     print(
         colored(f"{i + 1}. ", "light_magenta", attrs=["bold"]),
         colored(f"Rollback: {roll} -", "blue", attrs=["bold"]),
         colored(f"Email: {email} -", "green"),
-        colored(f"VipLevel: {vip}", "yellow"),
+        colored(f"VipLevel: {viplevel}", "yellow"),
     )
 
-    results.append((roll, email, vip))
-    results.sort(key=lambda x: x[0], reverse=True)
-    os.makedirs("results", exist_ok=True)
-    filename = f"results/{datetime.now().strftime("%Y-%m-%d")}.txt"
-    with open(filename, "a") as file:
-        for roll, email, vip in results:
-            file.write(f"Rollback: {roll} - Email: {email} - VipLevel: {vip}\n")
+
+results.sort(key=lambda x: x[0], reverse=True)
+os.makedirs("results", exist_ok=True)
+with open(f"results/{datetime.now().strftime("%Y-%m-%d")}.txt", "a") as file:
+    for roll, email, viplevel in results:
+        file.write(f"Rollback: {roll} - Email: {email} - VipLevel: {viplevel}\n")
